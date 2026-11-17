@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ECE 5 Lab 4 – Line Tracking Robot</title>
+  <meta name="description" content="ECE 5 Lab 4 final project: a PID-controlled line following robot built on an ESP32.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!--
+  HOW TO EDIT THIS PAGE
+  ---------------------
+  Images: drop files into the images/ folder using the exact filenames referenced below.
+  If an image file is missing, the page shows a dashed box telling you which file to add.
+-->
+
+<header class="site-header">
+  <nav class="nav">
+    <a href="#top" class="brand">ECE 5 · Lab 4</a>
+    <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">☰</button>
+    <ul class="nav-links">
+      <li><a href="#team">Team</a></li>
+      <li><a href="#build">Build</a></li>
+      <li><a href="#robot">Final Robot</a></li>
+      <li><a href="#pid">PID</a></li>
+      <li><a href="#poster">Poster</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main id="top">
+
+  <!-- ============ HERO ============ -->
+  <section class="hero">
+    <div class="hero-inner">
+      <p class="eyebrow">ECE 5 · Embedded Systems &amp; Control · UC San Diego</p>
+      <h1>Lab 4: Line Tracking Robot</h1>
+      <p class="hero-sub">
+        An ESP32-powered robot that follows a black line using a seven-photoresistor sensor array
+        and a PID controller we can tune live with potentiometer knobs.
+      </p>
+      <div class="hero-meta">
+        <div><span>Team #</span><strong>69</strong></div>
+        <div><span>Team Name</span><strong>KANT</strong></div>
+      </div>
+    </div>
+    <svg class="hero-line" viewBox="0 0 1200 120" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0,90 C200,90 260,20 420,30 S700,110 860,70 S1080,20 1200,40" />
+    </svg>
+  </section>
+
+  <!-- ============ TEAM ============ -->
+  <section id="team" class="section">
+    <div class="container">
+      <h2 class="section-title"><span>01</span> The Team</h2>
+      <div class="team-grid">
+        <div class="member"><div class="avatar">KN</div><h3>Kevin Nguyen</h3></div>
+        <div class="member"><div class="avatar">KC</div><h3>Kevin Chrikjian</h3></div>
+        <div class="member"><div class="avatar">TR</div><h3>Tanzim Rahman</h3></div>
+        <div class="member"><div class="avatar">NA</div><h3>Nizar Ali</h3></div>
+      </div>
+
+      <h3 class="sub-title">Competition Day Team Photo</h3>
+      <figure class="photo wide">
+        <img src="images/team-photo.jpg" alt="Our team on competition day" data-file="images/team-photo.jpg">
+        <figcaption>Team KANT on competition day</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ============ BUILD ============ -->
+  <section id="build" class="section alt">
+    <div class="container">
+      <h2 class="section-title"><span>02</span> Building the Robot</h2>
+      <p class="lead">
+        We built and tested each subsystem on its own first, then brought them together on our 3D-printed chassis.
+        Testing every part separately made it much easier to find problems before running the full line-following program.
+      </p>
+
+      <h3 class="sub-title">Prototyping Parts</h3>
+      <div class="card-grid">
+        <article class="card">
+          <figure class="photo"><img src="images/build-potentiometers.jpg" alt="Potentiometer breadboard" data-file="images/build-potentiometers.jpg"></figure>
+          <div class="card-body">
+            <span class="tag">1A</span>
+            <h4>Potentiometers</h4>
+            <p>Four potentiometers on a breadboard set <b>Speed</b>, <b>P</b>, <b>I</b> and <b>D</b>. Each one works as a
+              voltage divider read by the ESP32's ADC, so we could retune the robot right at the track
+              without uploading new code.</p>
+          </div>
+        </article>
+
+        <article class="card">
+          <figure class="photo"><img src="images/build-photoresistors.jpg" alt="Photoresistor sensor array" data-file="images/build-photoresistors.jpg"></figure>
+          <div class="card-body">
+            <span class="tag">1B</span>
+            <h4>Photoresistors</h4>
+            <p>Seven photoresistors, each in a voltage divider with a 10&nbsp;kΩ resistor and wired to IO1–IO7, make up
+              the line sensor. Black tape reflects less light than white paper, so the voltage at each sensor
+              shows whether it is over the line.</p>
+          </div>
+        </article>
+
+        <article class="card">
+          <figure class="photo"><img src="images/build-motors.jpg" alt="Motors and L298N motor driver" data-file="images/build-motors.jpg"></figure>
+          <div class="card-body">
+            <span class="tag">1C</span>
+            <h4>Motor Driver &amp; ESP32</h4>
+            <p>An L298N dual H-bridge drives the two DC gear motors. IN1–IN4 set each motor's direction and
+              ENA/ENB take PWM signals for speed. We soldered leads onto the motor tabs and covered the
+              joints in hot glue for strain relief. All grounds share a common connection.</p>
+          </div>
+        </article>
+
+        <article class="card">
+          <figure class="photo"><img src="images/build-cad.png" alt="Onshape CAD of chassis" data-file="images/build-cad.png"></figure>
+          <div class="card-body">
+            <span class="tag">1D</span>
+            <h4>CAD the Chassis</h4>
+            <p>We started from the provided chassis in Onshape and changed it to fit our robot. The motors mount at the rear
+              and a ball caster supports the front.</p>
+          </div>
+        </article>
+      </div>
+
+      <h3 class="sub-title">Assembly</h3>
+      <div class="assembly">
+        <figure class="photo"><img src="images/assembly-1.jpg" alt="Assembly in progress" data-file="images/assembly-1.jpg"></figure>
+        <figure class="photo"><img src="images/assembly-2.jpg" alt="Assembly in progress" data-file="images/assembly-2.jpg"></figure>
+        <div class="assembly-text">
+          <ol class="steps">
+            <li>Taped the yellow gear motors to the chassis and screwed the ball caster on with M3×6 screws.</li>
+            <li>Mounted the ESP32, the L298N and the breadboards, and organized the wiring with tape.</li>
+            <li>Mounted the photoresistor array at the front at a fixed height, with a light shield around it.</li>
+            <li>Re-ran each test program (potentiometers, photoresistors, motors) on the assembled robot before running the full code.</li>
+            <li>Added an indicator LED so we could see which calibration step the robot was on.</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FINAL ROBOT (ANNOTATED) ============ -->
+  <section id="robot" class="section">
+    <div class="container">
+      <h2 class="section-title"><span>03</span> Final Competition Robot</h2>
+      <p class="lead">Our robot as it ran on competition day.</p>
+
+      <!--
+        ANNOTATED PHOTO
+        Each .callout has:
+          data-x / data-y   = where the arrow POINTS on the photo (percent of width / height)
+          data-lx / data-ly = where the LABEL sits (percent of width / height)
+        Open the page, compare against your photo, and nudge the numbers until the arrows land on the right parts.
+      -->
+      <div class="annotated" id="annotated-robot">
+        <img src="images/robot-final.jpg" alt="Final competition robot with labeled features" data-file="images/robot-final.jpg">
+        <div class="callout" data-x="50" data-y="85" data-lx="62" data-ly="94">7× Photoresistor sensor array</div>
+        <div class="callout" data-x="45" data-y="70" data-lx="4"  data-ly="88">Light shield</div>
+        <div class="callout" data-x="45" data-y="40" data-lx="4"  data-ly="8">ESP32 Dev Board</div>
+        <div class="callout" data-x="60" data-y="35" data-lx="70" data-ly="6">L298N motor driver</div>
+        <div class="callout" data-x="70" data-y="55" data-lx="78" data-ly="42">Speed / P / I / D knobs</div>
+        <div class="callout" data-x="20" data-y="55" data-lx="2"  data-ly="45">DC gear motor + wheel</div>
+        <div class="callout" data-x="35" data-y="25" data-lx="30" data-ly="2">Calibration LED</div>
+        <div class="callout" data-x="80" data-y="70" data-lx="80" data-ly="80">Battery pack</div>
+      </div>
+      <ol class="callout-legend" id="annotated-robot-legend"></ol>
+
+      <div class="photo-row">
+        <figure class="photo"><img src="images/robot-side.jpg" alt="Robot side view" data-file="images/robot-side.jpg"><figcaption>Side view</figcaption></figure>
+        <figure class="photo"><img src="images/robot-bottom.jpg" alt="Robot underside" data-file="images/robot-bottom.jpg"><figcaption>Underside: sensors &amp; caster</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PID ============ -->
+  <section id="pid" class="section alt">
+    <div class="container">
+      <h2 class="section-title"><span>04</span> PID Control</h2>
+
+      <div class="two-col">
+        <div>
+          <h3 class="sub-title first">How it works</h3>
+          <p>
+            Every loop, the robot reads its seven photoresistors and works out where the line is under it.
+            Subtracting the position we want (line centered) gives the <b>error</b>. A PID controller turns
+            that error into a <b>turn rate</b>, which speeds up one motor and slows down the other to steer
+            back onto the line.
+          </p>
+          <div class="formula">
+            <div><span class="k">error</span> = measured position − desired position</div>
+            <div><span class="k">turn</span> = K<sub>P</sub>·e + K<sub>I</sub>·Σe + K<sub>D</sub>·(e − e<sub>prev</sub>)</div>
+            <div><span class="k">left</span> = speed + turn &nbsp;·&nbsp; <span class="k">right</span> = speed − turn</div>
+          </div>
+          <p class="small">The sign convention depends on which way the error is defined.</p>
+        </div>
+
+        <figure class="diagram">
+          <svg viewBox="0 0 520 260" role="img" aria-label="PID block diagram">
+            <defs>
+              <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0,0 L10,5 L0,10 z" class="ah"/>
+              </marker>
+            </defs>
+            <text x="6" y="118" class="lbl">Desired</text>
+            <text x="6" y="134" class="lbl">position</text>
+            <line x1="62" y1="126" x2="92" y2="126" class="wire" marker-end="url(#ah)"/>
+            <circle cx="104" cy="126" r="12" class="node"/><text x="98" y="131" class="sym">−</text>
+            <line x1="116" y1="126" x2="150" y2="126" class="wire"/>
+            <text x="124" y="118" class="lbl">e</text>
+            <line x1="150" y1="40" x2="150" y2="212" class="wire"/>
+            <line x1="150" y1="40" x2="176" y2="40" class="wire" marker-end="url(#ah)"/>
+            <line x1="150" y1="126" x2="176" y2="126" class="wire" marker-end="url(#ah)"/>
+            <line x1="150" y1="212" x2="176" y2="212" class="wire" marker-end="url(#ah)"/>
+            <rect x="178" y="20" width="110" height="40" rx="6" class="box p"/><text x="233" y="45" class="bt">K<tspan baseline-shift="sub" font-size="9">P</tspan> · e</text>
+            <rect x="178" y="106" width="110" height="40" rx="6" class="box i"/><text x="233" y="131" class="bt">K<tspan baseline-shift="sub" font-size="9">I</tspan> · Σe</text>
+            <rect x="178" y="192" width="110" height="40" rx="6" class="box d"/><text x="233" y="217" class="bt">K<tspan baseline-shift="sub" font-size="9">D</tspan> · Δe</text>
+            <polyline points="288,40 330,40 330,112" class="wire" marker-end="url(#ah)"/>
+            <line x1="288" y1="126" x2="316" y2="126" class="wire" marker-end="url(#ah)"/>
+            <polyline points="288,212 330,212 330,140" class="wire" marker-end="url(#ah)"/>
+            <circle cx="330" cy="126" r="12" class="node"/><text x="323" y="131" class="sym">+</text>
+            <line x1="342" y1="126" x2="388" y2="126" class="wire" marker-end="url(#ah)"/>
+            <text x="350" y="118" class="lbl">turn</text>
+            <rect x="390" y="104" width="80" height="44" rx="6" class="box robot"/><text x="430" y="131" class="bt">Robot</text>
+            <polyline points="470,126 505,126 505,250 104,250 104,140" class="wire" marker-end="url(#ah)"/>
+            <text x="240" y="244" class="lbl">measured line position (photoresistors)</text>
+          </svg>
+          <figcaption>Each gain is set live by its own potentiometer.</figcaption>
+        </figure>
+      </div>
+
+      <div class="term-grid">
+        <div class="term p"><h4>P · Proportional</h4><p>Reacts to the error right now. The further the robot drifts from the line, the harder it turns. Too low and it can't make the curves; too high and it wobbles side to side.</p></div>
+        <div class="term i"><h4>I · Integral</h4><p>Adds up past error, so a small error that doesn't go away (for example, one motor running a little faster) slowly builds a correction. Too much and it overshoots and keeps oscillating.</p></div>
+        <div class="term d"><h4>D · Derivative</h4><p>Reacts to how fast the error is changing. It damps the wobble that P causes and helps the robot catch sharp turns early.</p></div>
+      </div>
+
+      <h3 class="sub-title">Calibration</h3>
+      <p>
+        At startup the robot records each sensor's reading over white, then over black after three warning
+        blinks of the indicator LED. Each reading is then scaled to a 0–100 range, so all seven sensors
+        respond the same way even if they differ slightly from each other or the room lighting changes.
+      </p>
+
+    </div>
+  </section>
+
+  <!-- ============ POSTER ============ -->
+  <section id="poster" class="section alt">
+    <div class="container">
+      <h2 class="section-title"><span>05</span> Poster</h2>
+      <p class="lead">The poster we submitted in Week 10.</p>
+      <figure class="photo poster">
+        <a href="images/poster.png" target="_blank" rel="noopener">
+          <img src="images/poster.png" alt="Team project poster" data-file="images/poster.png">
+        </a>
+        <figcaption>Click to open full size. <a href="images/poster.pdf" target="_blank" rel="noopener">PDF version</a></figcaption>
+      </figure>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <p>ECE 5 · Lab 4 · UC San Diego Jacobs School of Engineering</p>
+  <p>Kevin Nguyen · Kevin Chrikjian · Tanzim Rahman · Nizar Ali</p>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
